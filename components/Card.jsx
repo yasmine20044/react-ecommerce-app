@@ -1,17 +1,20 @@
 import { BsFillBagFill } from "react-icons/bs";
 import { FiHeart } from "react-icons/fi";
 import { FaHeart } from "react-icons/fa";
+import { FiEye } from "react-icons/fi";
 import { useState } from "react";
 import { useShop } from "../src/Hooks/ShopContext";
 import { useNavigate } from "react-router-dom";
 
 const Card = ({ img, title, star, reviews, prevPrice, newPrice, product }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
-  const { addToCart, addToFavorites, removeFromFavorites, isFavorite } = useShop();
+  const { addToCart, addToFavorites, removeFromFavorites, isFavorite, incrementProductView, getProductViews } = useShop();
   const navigate = useNavigate();
   const isProductFavorite = isFavorite(product.id);
+  const viewCount = getProductViews(product.id);
   
   const handleProductClick = () => {
+    incrementProductView(product.id);
     navigate(`/Product/${product.id}`);
   };
   
@@ -42,6 +45,9 @@ const Card = ({ img, title, star, reviews, prevPrice, newPrice, product }) => {
             <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
           </div>
         )}
+        <div className="absolute top-2 left-2 bg-white bg-opacity-80 rounded-full px-2 py-1 flex items-center text-xs text-gray-600">
+          <FiEye className="mr-1" /> {viewCount}
+        </div>
         <button
           onClick={handleFavoriteClick}
           className="absolute top-2 right-2 p-2 bg-white bg-opacity-80 rounded-full hover:bg-opacity-100 transition-all"
