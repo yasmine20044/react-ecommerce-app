@@ -12,12 +12,18 @@ export function ShopProvider({ children }) {
   const [query, setQuery] = useState("");
   const [favorites, setFavorites] = useState([]);
   const [showFavorites, setShowFavorites] = useState(false);
+  const [productViews, setProductViews] = useState({});
 
-  // Load favorites from localStorage on initial render
+  // Load favorites and views from localStorage on initial render
   useEffect(() => {
     const savedFavorites = localStorage.getItem("favorites");
     if (savedFavorites) {
       setFavorites(JSON.parse(savedFavorites));
+    }
+    
+    const savedViews = localStorage.getItem("productViews");
+    if (savedViews) {
+      setProductViews(JSON.parse(savedViews));
     }
   }, []);
 
@@ -25,6 +31,23 @@ export function ShopProvider({ children }) {
   useEffect(() => {
     localStorage.setItem("favorites", JSON.stringify(favorites));
   }, [favorites]);
+
+  // Save product views to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("productViews", JSON.stringify(productViews));
+  }, [productViews]);
+
+  // Track product views
+  const incrementProductView = (productId) => {
+    setProductViews(prev => ({
+      ...prev,
+      [productId]: (prev[productId] || 0) + 1
+    }));
+  };
+
+  const getProductViews = (productId) => {
+    return productViews[productId] || 0;
+  };
 
   // Input filter functions
   const handleInputChange = (event) => {
@@ -148,7 +171,9 @@ export function ShopProvider({ children }) {
     addToFavorites,
     removeFromFavorites,
     toggleFavorites,
-    isFavorite
+    isFavorite,
+    incrementProductView,
+    getProductViews
   };
 
   return <ShopContext.Provider value={value}>{children}</ShopContext.Provider>;
