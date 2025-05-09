@@ -11,7 +11,7 @@ const Product = () => {
     const [loading, setLoading] = useState(true);
     const [imageLoaded, setImageLoaded] = useState(false);
     const navigate = useNavigate();
-    const { addToCart } = useShop();
+    const { addToCart, incrementProductView, getProductViews } = useShop();
 
     useEffect(() => {
         // Convert the id from string to number and find the product
@@ -22,11 +22,21 @@ const Product = () => {
             setProduct(foundProduct);
             setLoading(false);
             document.title = `${foundProduct.title} | E-commerce`;
+            
+            // Track if this product has been viewed in this session
+            const viewedProducts = JSON.parse(sessionStorage.getItem('viewedProducts') || '{}');
+            if (!viewedProducts[productId]) {
+                // Only increment view if this is the first time viewing in this session
+                incrementProductView(productId);
+                // Mark this product as viewed in this session
+                viewedProducts[productId] = true;
+                sessionStorage.setItem('viewedProducts', JSON.stringify(viewedProducts));
+            }
         } else {
             // Product not found, redirect to homepage
             navigate("/");
         }
-    }, [id, navigate]);
+    }, [id, navigate, incrementProductView]);
 
     if (loading) {
         return (
@@ -107,7 +117,7 @@ const Product = () => {
                                             <span className="font-medium">Color:</span> {product.color}
                                         </p>
                                         <p className="text-sm text-gray-600">
-                                            <span className="font-medium">Views:</span> {product.views || 0}
+                                            <span className="font-medium">Views:</span> {getProductViews(product.id)}
                                         </p>
                                     </div>
                                 </div>
